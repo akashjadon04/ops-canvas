@@ -88,7 +88,7 @@ Ops Canvas relies on that native boundary rather than bypassing it; see
 ## Project structure
 
 ```text
-src/OpsCanvas/Portal.cls     UI shell and current-session context
+src/OpsCanvas/Ui.cls         UI shell and current-session context
 src/OpsCanvas/Overview.cls   Bounded read-only system, security, task, and audit queries
 src/OpsCanvas/API.cls        CSP REST routes
 tests/OpsCanvas/unittests/   %UnitTest coverage
