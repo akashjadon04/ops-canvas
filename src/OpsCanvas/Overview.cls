@@ -85,7 +85,7 @@ ClassMethod Security() As %DynamicObject
                 set state = $select(result.%Get("Enabled"):"enabled",1:"disabled")
                 set description = result.%Get("Description")
                 if description="" set description = result.%Get("Type")_" TLS configuration"
-                do rows.%Push({"kind":"tls "_state,"name":(result.%Get("Name")),"detail":(description)})
+                do rows.%Push({"kind":("tls "_state),"name":(result.%Get("Name")),"detail":(description)})
             }
             set alias = ""
             for {
