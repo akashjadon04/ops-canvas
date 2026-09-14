@@ -3,14 +3,15 @@ Include %occStatus
 Class OpsCanvas.Ui
 {
 
-ClassMethod Dashboard(namespace As %String = $namespace, version As %String = $zv) As %DynamicObject
+ClassMethod Dashboard() As %DynamicObject
 {
+    set ns = $namespace, productVersion = $zv
     quit {
-        "productVersion":(version),
-        "namespace":(namespace),
+        "productVersion":(productVersion),
+        "namespace":(ns),
         "username":($username),
-        "managementApiBase":("/api/mgmnt/v1/"_namespace),
-        "restAppsEndpoint":("/api/mgmnt/v1/"_namespace_"/restapps")
+        "managementApiBase":("/api/mgmnt/v1/"_ns),
+        "restAppsEndpoint":("/api/mgmnt/v1/"_ns_"/restapps")
     }
 }
 
