@@ -13,11 +13,11 @@ Method TestRoleProfiles()
 
 Method TestDashboard()
 {
-    set dashboard = ##class(OpsCanvas.Ui).Dashboard("IRISAPP", "test-version")
+    set dashboard = ##class(OpsCanvas.Ui).Dashboard()
 
-    do $$$AssertEquals(dashboard.%Get("namespace"), "IRISAPP")
-    do $$$AssertEquals(dashboard.%Get("productVersion"), "test-version")
-    do $$$AssertEquals(dashboard.%Get("restAppsEndpoint"), "/api/mgmnt/v1/IRISAPP/restapps")
+    do $$$AssertEquals(dashboard.%Get("namespace"), $namespace)
+    do $$$AssertEquals(dashboard.%Get("productVersion"), $zv)
+    do $$$AssertEquals(dashboard.%Get("restAppsEndpoint"), "/api/mgmnt/v1/"_$namespace_"/restapps")
     do $$$AssertEquals(dashboard.%Get("username"), $username)
 }
 
