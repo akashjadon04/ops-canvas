@@ -18,14 +18,24 @@ Method TestDashboard()
     do $$$AssertEquals(dashboard.%Get("namespace"), "IRISAPP")
     do $$$AssertEquals(dashboard.%Get("productVersion"), "test-version")
     do $$$AssertEquals(dashboard.%Get("restAppsEndpoint"), "/api/mgmnt/v1/IRISAPP/restapps")
+    do $$$AssertEquals(dashboard.%Get("username"), $username)
 }
 
 Method TestRenderedPage()
 {
-    set page = ##class(OpsCanvas.Portal).RenderHome("IRISAPP", "test-version")
+    set page = ##class(OpsCanvas.Portal).RenderHome()
 
     do $$$AssertTrue(page["Ops Canvas", "The page presents the product identity")
-    do $$$AssertTrue(page["/api/mgmnt/v1/IRISAPP/restapps", "The UI uses the Management API endpoint")
+    do $$$AssertTrue(page["api/overview", "The UI loads the multi-surface overview")
+    do $$$AssertTrue(page["Inspection only", "The UI clearly labels its read-only boundary")
+}
+
+Method TestUnavailableSection()
+{
+    set section = ##class(OpsCanvas.Overview).Unavailable()
+
+    do $$$AssertEquals(section.%Get("available"), 0)
+    do $$$AssertEquals(section.%Get("rows").%Size(), 0)
 }
 
 }

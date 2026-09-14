@@ -1,0 +1,19 @@
+name: Verify IRIS module
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build and run unit tests
+        run: docker build --build-arg TESTS=1 --tag ops-canvas:test .

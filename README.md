@@ -1,105 +1,103 @@
 # Ops Canvas
 
-Ops Canvas is a small, read-only management companion for InterSystems IRIS.
-It gives an administrator a clear starting point before a configuration change:
+Ops Canvas is a deliberately read-only management companion for InterSystems
+IRIS. It turns the first minutes of an operational task into a clear,
+least-privilege briefing: what surface is involved, what the signed-in account
+can see, and where an administrator should make an intentional change in the
+Management Portal.
 
-- a live inventory of REST-enabled applications from the IRIS Management API;
-- a plain-language map of the Operator, Manager, and Security Manager privilege
-  lanes; and
-- the running namespace and IRIS version, visible in the same briefing.
+It is designed for the **Build Your Own Management Portal** contest, but the
+project is a normal open-source IRIS module and runs on IRIS Community Edition
+or IRIS for Health Community Edition.
 
-The application deliberately does not write to IRIS configuration. It keeps the
-existing Management Portal as the place where privileged changes happen, while
-making the discovery and least-privilege decision easier to review first.
+## Why read-only first?
 
-## Why this is useful
+Management work is often split awkwardly between quick inspection and
+high-impact changes. Ops Canvas keeps that boundary visible. It never stores
+credentials, proxies sessions, or offers configuration mutations. Instead, it
+uses the current authenticated IRIS session and reports an unavailable surface
+when that session lacks access. No placeholder data is substituted.
 
-Management consoles often put discovery and mutation in the same dense surface.
-That makes it easy to reach for an elevated account before understanding what
-will be affected. Ops Canvas starts with the question an operator should answer
-first: **which application surface am I about to manage, and which role should
-own that decision?**
+## What it covers
 
-The REST application panel reads the documented Management API endpoint:
+| Portal area | Read-only capability | Data boundary |
+| --- | --- | --- |
+| Web apps and REST APIs | Lists REST-enabled applications in the current namespace. | Uses the Management API with the browser's session. |
+| Permission management | Lists roles and enabled accounts visible to the caller. | No roles or users are changed. |
+| Security and secrets | Lists TLS names, accessible X.509 aliases/expiry, and OAuth issuer configuration. | Never selects private keys, passwords, wallet values, tokens, or client secrets. |
+| Task management | Lists scheduled task names, descriptions, and state. | No task action is implemented. |
+| Operations | Lists bounded process metadata and mounted database capacity. | No process or database is modified. |
+| Logs | Lists recent audit metadata only. | Audit descriptions and `EventData` are deliberately excluded. |
 
-\`\`\`
-GET /api/mgmnt/v1/:namespace/restapps
-\`\`\`
-
-The request runs in the browser using the administrator's current IRIS session.
-Credentials are never copied into JavaScript, stored by the application, or
-proxied by a second service.
-
-## Features
-
-- **Session-aware REST inventory**: Lists REST-enabled applications from IRIS'
-  Management API, using the user's existing authenticated session.
-- **Least-privilege briefing**: Explains the scopes represented by
-  \`%Admin_Operate\`, \`%Admin_Manage\`, and \`%Admin_Secure\`.
-- **Safe failure state**: If the signed-in user cannot query the API, the UI
-  explains the required access instead of presenting stale or invented data.
-- **No build toolchain for the UI**: The interface is delivered from the IRIS
-  REST application as one responsive, dependency-free page.
-- **Unit coverage**: Tests verify the role lanes, management endpoint
-  construction, and rendered application shell.
+The app calls the documented endpoint
+`/api/mgmnt/v1/:namespace/restapps`. See the official
+[Management API reference](https://docs.intersystems.com/irislatest/csp/docbook/DocBook.UI.Page.cls?KEY=GREST_reference).
 
 ## Run locally
 
-Prerequisites:
+Prerequisites: Docker Desktop and Git.
 
-- Docker Desktop
-- Git
-
-\`\`\`bash
-git clone <your-fork-url> ops-canvas
+```bash
+git clone https://github.com/akashjadon04/ops-canvas.git
 cd ops-canvas
 docker compose up -d --build
-\`\`\`
+```
 
 Open [http://localhost:52773/ops-canvas/](http://localhost:52773/ops-canvas/)
-and sign in with an IRIS user that is permitted to view the target namespace.
+and sign in with the normal IRIS account appropriate for the surfaces you
+intend to inspect. Ops Canvas does not add privileges. If a panel is
+unavailable, use the minimum role that has the relevant access and refresh.
 
-The backing JSON endpoint is available at:
+Supporting JSON endpoints:
 
-\`\`\`
+```text
 http://localhost:52773/ops-canvas/api/dashboard
-\`\`\`
+http://localhost:52773/ops-canvas/api/overview
+```
 
 ## Test
 
-From an IRIS terminal in the container:
+The repository builds the IRIS module and runs `%UnitTest` in GitHub Actions on
+pushes and pull requests. Run the same verification locally with:
 
-\`\`\`objectscript
+```bash
+docker build --build-arg TESTS=1 --tag ops-canvas:test .
+```
+
+Or, from an IRIS terminal:
+
+```objectscript
 zn "IRISAPP"
-zpm "test ops-canvas"
-\`\`\`
-
-Or run the tests during a container build by building with \`TESTS=1\`.
+zpm "test ops-canvas -v"
+```
 
 ## Security model
 
-Ops Canvas is intentionally an inspection surface, not an alternate privileged
-control plane.
-
-| Capability | How it is handled |
+| Concern | Ops Canvas behavior |
 | --- | --- |
-| Application inventory | Read directly from the Management API with the current session |
-| Credentials | Never persisted, forwarded, or displayed |
-| Configuration writes | Not implemented |
-| Authorization | Enforced by IRIS for the current Management API request |
-| Failures | Shown as access guidance; no mock data is substituted |
+| Authentication | Reuses the existing same-origin IRIS session. |
+| Authorization | Each source API/query evaluates under the caller's own privileges; no escalation is implemented. |
+| Secret handling | Private keys, passwords, wallet values, token values, audit descriptions, and audit `EventData` are not selected or sent to the browser. |
+| Mutation | No POST, PUT, PATCH, DELETE, task action, credential update, or process action is implemented. |
+| Failure behavior | A denied source renders an unavailable state; other permitted panels still work. |
+
+Recent IRIS versions require elevated security privileges for security APIs.
+Ops Canvas relies on that native boundary rather than bypassing it; see
+[Using Security APIs and Role Escalation](https://docs.intersystems.com/irislatest/csp/docbook/DocBook.UI.Page.cls?KEY=ASECURITYAPI).
 
 ## Project structure
 
-\`\`\`
-src/OpsCanvas/Portal.cls       Dashboard data and UI renderer
-src/OpsCanvas/API.cls          CSP REST routes
-tests/OpsCanvas/unittests/     %UnitTest coverage
-module.xml                     ZPM module and /ops-canvas application registration
-\`\`\`
+```text
+src/OpsCanvas/Portal.cls     UI shell and current-session context
+src/OpsCanvas/Overview.cls   Bounded read-only system, security, task, and audit queries
+src/OpsCanvas/API.cls        CSP REST routes
+tests/OpsCanvas/unittests/   %UnitTest coverage
+module.xml                   ZPM module and /ops-canvas registration
+```
 
 ## Roadmap
 
-The next deliberately scoped additions are a role-aware database capacity
-briefing and a task-schedule preview. Both will remain read-only until their
-management API behavior and authorization boundaries have been validated.
+The next milestone is a demo capture from IRIS Community Edition and more
+panel-specific tests. Any future mutation feature must be opt-in, individually
+authorized, documented, and tested; it will not be silently added to this
+inspection portal.

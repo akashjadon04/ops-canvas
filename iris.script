@@ -4,11 +4,6 @@
     zpm "enable -map -globally"
     zpm "enable -community"
 
-    // Unexpire passwords and set up passwordless mode to simplify dev use.
-    // ** Comment out these two line for Production use **
-    do ##class(Security.Users).UnExpireUserPasswords("*")
-    //zpm "install passwordless"
-
     // Enable callin for Embedded Python - see merge.cpf
     //do ##class(Security.Services).Get("%Service_CallIn",.prop)
     //set prop("Enabled")=1
