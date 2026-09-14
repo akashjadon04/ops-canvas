@@ -3,7 +3,7 @@
   <Document name="ops-canvas.ZPM">
     <Module>
       <Name>ops-canvas</Name>
-      <Version>0.1.7</Version>
+      <Version>0.1.8</Version>
       <Description>Read-only least-privilege management companion for InterSystems IRIS</Description>
       <Packaging>module</Packaging>
       <SourcesRoot>src</SourcesRoot>
