@@ -1,4 +1,4 @@
-Class OpsCanvas.Portal
+Class OpsCanvas.Ui
 {
 
 ClassMethod RoleProfiles() As %DynamicArray

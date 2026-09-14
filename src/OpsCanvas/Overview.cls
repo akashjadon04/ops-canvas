@@ -20,7 +20,7 @@ ClassMethod Available(rows As %DynamicArray) As %DynamicObject
 ClassMethod Build() As %DynamicObject
 {
     quit {
-        "context":(##class(OpsCanvas.Portal).Dashboard()),
+        "context":(##class(OpsCanvas.Ui).Dashboard()),
         "permissions":(..Permissions()),
         "security":(..Security()),
         "tasks":(..Tasks()),

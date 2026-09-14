@@ -15,14 +15,14 @@ XData UrlMap [ XMLNamespace = "http://www.intersystems.com/urlmap" ]
 ClassMethod Home() As %Status
 {
     set %response.ContentType = "text/html; charset=utf-8"
-    write ##class(OpsCanvas.Portal).RenderHome()
+    write ##class(OpsCanvas.Ui).RenderHome()
     quit $$$OK
 }
 
 ClassMethod GetDashboard() As %Status
 {
     set %response.ContentType = "application/json; charset=utf-8"
-    write ##class(OpsCanvas.Portal).Dashboard().%ToJSON()
+    write ##class(OpsCanvas.Ui).Dashboard().%ToJSON()
     quit $$$OK
 }
 

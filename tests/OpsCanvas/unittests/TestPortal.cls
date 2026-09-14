@@ -3,7 +3,7 @@ Class OpsCanvas.unittests.TestPortal Extends %UnitTest.TestCase
 
 Method TestRoleProfiles()
 {
-    set profiles = ##class(OpsCanvas.Portal).RoleProfiles()
+    set profiles = ##class(OpsCanvas.Ui).RoleProfiles()
 
     do $$$AssertEquals(profiles.%Size(), 3, "The UI presents three least-privilege operating lanes")
     do $$$AssertEquals(profiles.%Get(0).%Get("resource"), "%Admin_Operate")
@@ -13,7 +13,7 @@ Method TestRoleProfiles()
 
 Method TestDashboard()
 {
-    set dashboard = ##class(OpsCanvas.Portal).Dashboard("IRISAPP", "test-version")
+    set dashboard = ##class(OpsCanvas.Ui).Dashboard("IRISAPP", "test-version")
 
     do $$$AssertEquals(dashboard.%Get("namespace"), "IRISAPP")
     do $$$AssertEquals(dashboard.%Get("productVersion"), "test-version")
@@ -23,7 +23,7 @@ Method TestDashboard()
 
 Method TestRenderedPage()
 {
-    set page = ##class(OpsCanvas.Portal).RenderHome()
+    set page = ##class(OpsCanvas.Ui).RenderHome()
 
     do $$$AssertTrue(page["Ops Canvas", "The page presents the product identity")
     do $$$AssertTrue(page["api/overview", "The UI loads the multi-surface overview")
